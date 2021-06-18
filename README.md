@@ -1,4 +1,4 @@
-# tfg
+# TFG
 Cálculo de elementos finitos con redes neuronales convolucionales
 
 Se incluye en archivo de Colab con la red y la distribución de muestras usadas para su entrenamiento y testeo.
