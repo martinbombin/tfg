@@ -1,0 +1,161 @@
+/PREP7
+
+FX = 0
+FY = 0
+
+C*** Geometría del triangulo(mod)  
+RECTNG,0,2*0.03125e-3,0,0.75e-3,
+RECTNG,2*0.03125e-3,7*0.03125e-3,0.03125e-3,0.00075-0.03125e-3, 
+RECTNG,7*0.03125e-3,12*0.03125e-3,2*3.125e-05,0.00075-2*0.03125e-3, 
+RECTNG,12*0.03125e-3,17*0.03125e-3,3*3.125e-05,0.00075-3*0.03125e-3,
+RECTNG,17*0.03125e-3,22*0.03125e-3,4*3.125e-05,0.00075-4*0.03125e-3,
+RECTNG,22*0.03125e-3,27*0.03125e-3,5*3.125e-05,0.00075-5*0.03125e-3,
+RECTNG,27*0.03125e-3,32*0.03125e-3,6*3.125e-05,0.00075-6*0.03125e-3,
+RECTNG,10*0.03125e-3,12*0.03125e-3,11*0.03125e-3,0.00075-11*0.03125e-3, 
+RECTNG,12*0.03125e-3,20*0.03125e-3,10*0.03125e-3,0.00075-10*0.03125e-3, 
+RECTNG,20*0.03125e-3,22*0.03125e-3,11*0.03125e-3,0.00075-11*0.03125e-3, 
+RECTNG,14*0.03125e-3,18*0.03125e-3,9*0.03125e-3,0.00075-9*0.03125e-3,   
+ASBA,       3,       8  
+ASBA,       5,      10  
+FLST,2,2,5,ORDE,2   
+FITEM,2,3   
+FITEM,2,-4  
+ASBA,P51X,       9  
+APLOT   
+FLST,2,5,5,ORDE,5   
+FITEM,2,5   
+FITEM,2,8   
+FITEM,2,10  
+FITEM,2,-11 
+FITEM,2,13  
+FLST,2,4,5,ORDE,4   
+FITEM,2,5   
+FITEM,2,8   
+FITEM,2,10  
+FITEM,2,13  
+ASBA,P51X,      11  
+APLOT   
+FLST,2,9,5,ORDE,7   
+FITEM,2,1   
+FITEM,2,-4  
+FITEM,2,6   
+FITEM,2,-7  
+FITEM,2,9   
+FITEM,2,12  
+FITEM,2,14  
+AGLUE,P51X  
+
+C*** Tipo de material   
+ET,1,PLANE182   
+
+C*** Atributos del material 
+MPTEMP,,,,,,,,  
+MPTEMP,1,0  
+MPDATA,EX,1,,70e9   
+MPDATA,PRXY,1,,0.3  
+
+C*** Mallado
+FLST,2,9,5,ORDE,8   
+FITEM,2,5   
+FITEM,2,7   
+FITEM,2,-8  
+FITEM,2,10  
+FITEM,2,-11 
+FITEM,2,13  
+FITEM,2,15  
+FITEM,2,-17 
+AESIZE,P51X,0.03125e-3, 
+FLST,5,9,5,ORDE,8   
+FITEM,5,5   
+FITEM,5,7   
+FITEM,5,-8  
+FITEM,5,10  
+FITEM,5,-11 
+FITEM,5,13  
+FITEM,5,15  
+FITEM,5,-17 
+CM,_Y,AREA  
+ASEL, , , ,P51X 
+CM,_Y1,AREA 
+CHKMSH,'AREA'   
+CMSEL,S,_Y  
+!*  
+AMESH,_Y1   
+!*  
+CMDELE,_Y   
+CMDELE,_Y1  
+CMDELE,_Y2  
+!*  
+
+C*** Sujecion
+FLST,2,1,4,ORDE,1   
+FITEM,2,4   
+!*  
+/GO 
+DL,P51X, ,ALL,  
+
+C*** fuerza en x (mod)  
+FLST,2,1,4,ORDE,1   
+FITEM,2,26   
+/GO 
+!*  
+SFL,P51X,PRES,-FX,   
+
+FLST,2,14,1,ORDE,4  
+FITEM,2,1   
+FITEM,2,77  
+FITEM,2,82  
+FITEM,2,-93 
+FLST,2,13,1,ORDE,3  
+FITEM,2,77  
+FITEM,2,82  
+FITEM,2,-93 
+!*  
+/GO 
+F,P51X,FY,FY
+
+
+FINISH  
+/SOL
+SOLVE
+
+C*** Crea tabla de von misses
+FINISH  
+/POST1  
+SET, FIRST
+AVPRIN,0, , 
+ETABLE, ,S,EQV
+!*
+
+C***
+*VGET,von,ELEM, ,ETAB,SEQV, , ,2
+
+*VGET,elem1,ELEM, ,NODE,1, , ,2 
+*VGET,elem2,ELEM, ,NODE,2, , ,2 
+*VGET,elem3,ELEM, ,NODE,3, , ,2 
+*VGET,elem4,ELEM, ,NODE,4, , ,2 
+
+*VGET,xcord,NODE, ,LOC,X, , ,2
+*VGET,ycord,NODE, ,LOC,Y, , ,2
+
+*CREATE,ansuitmp
+
+*CFOPEN,'von','txt',' ' 
+*VWRITE,von(1,1), , , , , , , , ,   
+(E16.10)
+*CFCLOS 
+
+*CFOPEN,'elements','txt',' '
+*VWRITE,elem1(1,1), elem2(1,1), elem3(1,1), elem4(1,1), , , , , ,   
+(F10.0,' ',F10.0,' ',F10.0,' ',F10.0)   
+*CFCLOS 
+
+*CFOPEN,'nodes','txt',' '
+*VWRITE, xcord(1,1), ycord(1,1), , , , , , , ,   
+(E16.10,' ',E16.10)
+*CFCLOS 
+
+*END
+/INPUT,ansuitmp 
+!*  
+C*** ! /EXIT,ALL
